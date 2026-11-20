@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4edda">
+  <meta name="description" content="CraneDrop is a cozy pixel-art city builder for iOS. Place buildings, grow your town, and make the city your own.">
+  <title>CraneDrop — Build a little city</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4edda;
+      --ink: #263b32;
+      --muted: #64746a;
+      --green: #52775b;
+      --deep-green: #315343;
+      --orange: #e7834e;
+      --yellow: #f2c96d;
+      --card: #fffaf0;
+      --pixel: 4px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#d7ceb8 0.8px, transparent 0.8px);
+      background-size: 16px 16px;
+      font-family: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    .page { width: min(100% - 36px, 920px); margin: 0 auto; padding: 46px 0 28px; }
+    .hero { display: grid; justify-items: center; gap: 18px; text-align: center; }
+    .eyebrow { margin: 0; color: var(--deep-green); font-size: .76rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(2.8rem, 9vw, 5.3rem); line-height: .96; letter-spacing: -.065em; font-weight: 950; }
+    h1 span { color: var(--orange); }
+    .tagline { max-width: 470px; margin: 0; color: var(--muted); font-size: clamp(1rem, 2.5vw, 1.18rem); line-height: 1.65; }
+    .city-scene {
+      position: relative; isolation: isolate; overflow: hidden;
+      width: min(100%, 660px); height: 245px; margin: 10px 0 2px;
+      border: var(--pixel) solid var(--ink); border-radius: 5px;
+      background: linear-gradient(#b8d9cf 0 66%, #8dbb8b 66% 100%);
+      box-shadow: 8px 8px 0 var(--ink);
+      image-rendering: pixelated;
+    }
+    .sun { position: absolute; top: 24px; right: 12%; width: 48px; height: 48px; background: var(--yellow); box-shadow: 0 0 0 8px #f2c96d55; }
+    .cloud { position: absolute; top: 46px; left: 13%; width: 64px; height: 16px; background: #f7f4e8; box-shadow: 12px -12px 0 #f7f4e8, 24px 0 0 #f7f4e8; }
+    .building { position: absolute; bottom: 31px; border: 4px solid var(--ink); border-bottom-width: 5px; }
+    .building::after { content: ""; position: absolute; inset: 14px 9px; background: repeating-linear-gradient(90deg, #f3cb73 0 10px, transparent 10px 22px), repeating-linear-gradient(0deg, transparent 0 18px, #f3cb73 18px 27px); }
+    .b1 { left: 12%; width: 90px; height: 96px; background: #d9875b; }
+    .b2 { left: 30%; width: 82px; height: 137px; background: #e8bd68; }
+    .b3 { right: 17%; width: 106px; height: 112px; background: #8caa75; }
+    .b4 { right: 4%; width: 73px; height: 79px; background: #d9875b; }
+    .road { position: absolute; z-index: -1; left: 0; right: 0; bottom: 0; height: 32px; background: #53675b; border-top: 4px solid var(--ink); }
+    .road::after { content: ""; position: absolute; left: 0; right: 0; top: 11px; border-top: 3px dashed #f3d982; }
+    .crane { position: absolute; z-index: 2; top: 21px; left: 46%; width: 5px; height: 114px; background: var(--orange); box-shadow: 3px 0 var(--ink); }
+    .crane::before { content: ""; position: absolute; left: -30px; top: 0; width: 135px; height: 5px; background: var(--orange); box-shadow: 0 3px var(--ink); }
+    .crane::after { content: ""; position: absolute; left: 100px; top: 4px; width: 3px; height: 45px; background: var(--ink); }
+    .crane-cab { position: absolute; z-index: 3; left: calc(46% - 10px); top: 31px; width: 21px; height: 17px; background: var(--yellow); border: 3px solid var(--ink); }
+    .store-link {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      min-height: 48px; padding: 0 22px; color: #fffaf0; background: var(--deep-green);
+      border: 3px solid var(--ink); border-radius: 4px; box-shadow: 4px 4px 0 var(--ink);
+      font-size: .9rem; font-weight: 800; letter-spacing: .04em; text-decoration: none;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .store-link:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+    .store-link:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+    .store-link[aria-disabled="true"] { cursor: default; background: var(--orange); }
+    .store-link[aria-disabled="true"]:hover { transform: none; box-shadow: 4px 4px 0 var(--ink); }
+    .divider { height: 4px; width: min(100%, 660px); margin: 34px auto 26px; background: repeating-linear-gradient(90deg, var(--green) 0 18px, transparent 18px 26px); }
+    .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; width: min(100%, 660px); margin: 0 auto; }
+    .card { padding: 23px 24px; background: var(--card); border: 3px solid var(--ink); box-shadow: 5px 5px 0 #263b3220; }
+    .card-icon { font-size: 1.7rem; }
+    .card h2 { margin: 10px 0 8px; color: var(--deep-green); font-size: .85rem; letter-spacing: .12em; text-transform: uppercase; }
+    .card p { margin: 0; color: var(--muted); font-size: .96rem; line-height: 1.65; }
+    .card a { color: #a74d2b; font-weight: 700; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+    footer { margin-top: 35px; color: var(--muted); text-align: center; font-size: .8rem; }
+    footer a { margin-left: 8px; color: var(--deep-green); font-weight: 700; }
+    @media (max-width: 560px) {
+      .page { padding-top: 32px; }
+      .city-scene { height: 190px; }
+      .b1 { left: 7%; transform: scale(.82); transform-origin: bottom left; }
+      .b2 { left: 26%; transform: scale(.85); transform-origin: bottom left; }
+      .b3 { right: 14%; transform: scale(.82); transform-origin: bottom right; }
+      .b4 { right: -2%; transform: scale(.76); transform-origin: bottom right; }
+      .cards { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero" aria-labelledby="game-title">
+      <p class="eyebrow">A cozy city-building game for iOS</p>
+      <h1 id="game-title">Crane<span>Drop</span></h1>
+      <p class="tagline">A little space, a big idea. Place charming buildings, grow your neighborhood, and make a tiny pixel-art city all your own.</p>
+      <div class="city-scene" role="img" aria-label="A cheerful pixel-art city under construction, with colorful buildings and a crane">
+        <span class="sun"></span><span class="cloud"></span>
+        <span class="building b1"></span><span class="building b2"></span>
+        <span class="building b3"></span><span class="building b4"></span>
+        <span class="crane"></span><span class="crane-cab"></span><span class="road"></span>
+      </div>
+      <span class="store-link" aria-disabled="true">Coming soon to the App Store</span>
+    </section>
+
+    <div class="divider" aria-hidden="true"></div>
+
+    <section class="cards" aria-label="Game information">
+      <article class="card">
+        <div class="card-icon" aria-hidden="true">🏗️</div>
+        <h2>Make it yours</h2>
+        <p>CraneDrop is a relaxing pixel-art city builder for iPhone. Choose where each building goes and watch your own little town take shape.</p>
+      </article>
+      <article class="card">
+        <div class="card-icon" aria-hidden="true">✉️</div>
+        <h2>Support &amp; contact</h2>
+        <p>Have a question, idea, or bug report? <a href="https://github.com/jarih7/cranedrop-page/issues">Get in touch through GitHub</a>.</p>
+      </article>
+    </section>
+
+    <div class="divider" aria-hidden="true"></div>
+
+    <footer>&copy; <span id="year"></span> CraneDrop. All rights reserved. <a href="privacy.html">Privacy</a></footer>
+  </main>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
